@@ -7,6 +7,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<repositories>
+
+            <repository>
+                <id>mvnrepository</id>
+                <name>mvnrepository</name>
+                <url>http://www.mvnrepository.com</url>
+            </repository>
+
 	</repositories>
   <build>
     <plugins>
