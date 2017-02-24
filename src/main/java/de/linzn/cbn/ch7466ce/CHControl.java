@@ -1,19 +1,13 @@
 package de.linzn.cbn.ch7466ce;
 
-import java.io.IOException;
-
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
-import com.gargoylesoftware.htmlunit.html.HtmlTextInput;
-
 public class CHControl {
 	private static  CHControl instance;
 	
-	private String cbnIP = "";
-	private String cbnUsername = "";
-	private String cbnPassword = "";
+	private String cbnIP = "192.168.0.1";
+	private String cbnUsername = "admin";
+	private String cbnPassword = "password";
+	
+	private CBNApi cbnApi;
 	
 
 	public static void main(String[] args) {
@@ -22,48 +16,37 @@ public class CHControl {
 	}
 	
 	public CHControl(String[] args){
+		cbnApi = new CBNApi();
+	
+		
+		if (args.length >= 4){
+			this.cbnPassword = args[3];
+		} else if (args.length == 3){
+			this.cbnUsername = args[2];
+		} if (args.length == 2){
+			this.cbnIP = args[1];
+		} if (args.length < 1){
+			System.out.println("Argumente: (IP-Adresse) (CBNUser) (CBNPassword)");
+			return;
+		}
+		
 		String command = args[0];
-		this.cbnIP = args[1];
-		this.cbnUsername = args[2];
-		this.cbnPassword = args[3];
 		
 		switch (command) {
 		
 		case "restart":
-			restartCBN();
+			this.cbnApi.restartCBN(this.cbnIP, this.cbnUsername, this.cbnPassword);
 		
 		}
 		
 		
 	}
-	
-	private void restartCBN(){
-		try {
-			loginCBN();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-	
-	
-	
-	private void loginCBN() throws IOException {
-		final WebClient webClient = new WebClient();
-		final HtmlPage loginPage = webClient.getPage(cbnIP + "/common_page/login.html");
-		final HtmlForm form = loginPage.getFormByName("form-login");
 
-		final HtmlSubmitInput loginButton = form.getInputByValue("Login");
-		final HtmlTextInput userField = form.getInputByName("loginUsername");
-		userField.setValueAttribute(cbnUsername);
-		final HtmlTextInput passField = form.getInputByName("loginPassword");
-		passField.setValueAttribute(cbnPassword);
-		final HtmlPage page2 = loginButton.click();
-		System.out.println(page2.asText());
-	}
+	
+	
+	
 
-	public CHControl getInstance(){
+	public static CHControl getInstance(){
 		return instance;
 	}
 	
