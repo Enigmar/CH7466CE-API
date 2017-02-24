@@ -22,12 +22,34 @@ public class CHControl {
 	}
 	
 	public CHControl(String[] args){
+		String command = args[0];
+		this.cbnIP = args[1];
+		this.cbnUsername = args[2];
+		this.cbnPassword = args[3];
+		
+		switch (command) {
+		
+		case "restart":
+			restartCBN();
+		
+		}
+		
+		
+	}
+	
+	private void restartCBN(){
+		try {
+			loginCBN();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 	
 	
 	
-	private void loginCBN() throws IOException{
+	private void loginCBN() throws IOException {
 		final WebClient webClient = new WebClient();
 		final HtmlPage loginPage = webClient.getPage(cbnIP + "/common_page/login.html");
 		final HtmlForm form = loginPage.getFormByName("form-login");
