@@ -21,8 +21,11 @@ public class CHControl {
 		
 		if (args.length >= 4){
 			this.cbnPassword = args[3];
+			this.cbnUsername = args[2];
+			this.cbnIP = args[1];
 		} else if (args.length == 3){
 			this.cbnUsername = args[2];
+			this.cbnIP = args[1];
 		} if (args.length == 2){
 			this.cbnIP = args[1];
 		} if (args.length < 1){
