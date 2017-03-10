@@ -1,4 +1,4 @@
-package de.linzn.cbn.ch7466ce;
+package de.linzn.cbn.api.ch7466ce;
 
 import java.io.IOException;
 import java.util.logging.Level;
