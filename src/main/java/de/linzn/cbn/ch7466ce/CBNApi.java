@@ -18,6 +18,7 @@ public class CBNApi {
 	private String cbnIP;
 	private String cbnUsername;
 	private String cbnPassword;
+	private WebClient client;
 
 	public CBNApi(String cbnIP, String cbnUsername, String cbnPassword) {
 		this.cbnIP = cbnIP;
@@ -29,23 +30,20 @@ public class CBNApi {
 	// Public API
 
 	public void restartCBN() {
-		WebClient client = this.login_cbn_webinterface(this.cbnIP, this.cbnUsername, this.cbnPassword);
-		boolean status = this.restart_cbn_webinterface(client, this.cbnIP);
-		client.close();
+		this.client = init_web_client();
+		this.login_cbn_webinterface(this.cbnIP, this.cbnUsername, this.cbnPassword);
+		this.restart_cbn_webinterface(this.cbnIP);
+		this.client.close();
 	}
 
 	// Private functions
 
-	public boolean restart_cbn_webinterface(WebClient webClient, String cbnIP) {
+	public boolean restart_cbn_webinterface(String cbnIP) {
 		try {
 			System.out.println("Send restart signal to CBN-Modem...Take some while!");
-			webClient.waitForBackgroundJavaScript(4000);
-			HtmlPage restartPage = (HtmlPage) webClient.getPage("http://" + cbnIP + "/common_page/reboot.html");
-			webClient.waitForBackgroundJavaScript(4000);
-			
-			//System.out.println(restartPage.asText());
-			webClient.waitForBackgroundJavaScript(4000);
-			webClient.getOptions().setTimeout(4000);
+			this.client.waitForBackgroundJavaScript(4000);
+			this.client.getPage("http://" + cbnIP + "/common_page/reboot.html");
+			this.client.waitForBackgroundJavaScript(4000);
 			System.out.println("Signal send finish!");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -55,26 +53,11 @@ public class CBNApi {
 		return true;
 	}
 
-	private WebClient login_cbn_webinterface(String cbnIP, String cbnUsername, String cbnPassword) {
-		WebClient webClient = null;
+	private boolean login_cbn_webinterface(String cbnIP, String cbnUsername, String cbnPassword) {
 		try {
-			// disable error logging
-			LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog"); 
-			java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF); 
-			java.util.logging.Logger.getLogger("org.apache.commons.httpclient").setLevel(Level.OFF); 
-			java.util.logging.Logger.getLogger("org.apache.http.client.protocol.ResponseProcessCookies").setLevel(Level.OFF);
-			
-			System.out.println("Create connection to CBN-Modem...Take some while!");
-			webClient = new WebClient(BrowserVersion.CHROME);
-			webClient.getOptions().setCssEnabled(false);
-			webClient.getOptions().setUseInsecureSSL(true);
-			webClient.getOptions().setThrowExceptionOnScriptError(false);
-			webClient.getCookieManager().setCookiesEnabled(true);
-			webClient.setAjaxController(new NicelyResynchronizingAjaxController());
-			webClient.getOptions().setTimeout(1000);
 			System.out.println("Open login to CBN-Modem...Take some while!");
-			HtmlPage loginPage = (HtmlPage) webClient.getPage("http://" + cbnIP + "/common_page/login.html");
-			webClient.waitForBackgroundJavaScript(500);
+			HtmlPage loginPage = this.client.getPage("http://" + cbnIP + "/common_page/login.html");
+			this.client.waitForBackgroundJavaScript(500);
 			HtmlForm form = loginPage.getHtmlElementById("form-login");
 			HtmlTextInput userField = form.getInputByName("loginUsername");
 			userField.setValueAttribute(cbnUsername);
@@ -82,15 +65,35 @@ public class CBNApi {
 			passField.setValueAttribute(cbnPassword);
 			loginPage = form.getInputByValue("Login").click();
 			System.out.println("Logging in to CBN-Modem...Take some while!");
-			webClient.waitForBackgroundJavaScript(2000);
-			//System.out.println(loginPage.asText());
-			webClient.getOptions().setTimeout(1000);
+			this.client.waitForBackgroundJavaScript(2000);
 			System.out.println("Login finish!");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("No CBN Page found!");
+			return false;
 		}
-		return webClient;
+		return true;
+	}
+
+	private WebClient init_web_client() {
+		System.out.println("Create connection to CBN-Modem...Take some while!");
+		// Create web client
+		WebClient wClient = new WebClient(BrowserVersion.CHROME);
+		wClient.getOptions().setCssEnabled(false);
+		wClient.getOptions().setUseInsecureSSL(true);
+		wClient.getOptions().setThrowExceptionOnScriptError(false);
+		wClient.getCookieManager().setCookiesEnabled(true);
+		wClient.setAjaxController(new NicelyResynchronizingAjaxController());
+		wClient.getOptions().setTimeout(1000);
+
+		// Disable error logging
+		LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log",
+				"org.apache.commons.logging.impl.NoOpLog");
+		java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
+		java.util.logging.Logger.getLogger("org.apache.commons.httpclient").setLevel(Level.OFF);
+		java.util.logging.Logger.getLogger("org.apache.http.client.protocol.ResponseProcessCookies")
+				.setLevel(Level.OFF);
+		return wClient;
 	}
 
 }

@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.linzn</groupId>
 	<packaging>jar</packaging>
-	<name>ch7466ce-controller</name>
+	<name>ch7466ce-api</name>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -41,8 +41,8 @@
 		</plugin>
     </plugins>
   </build>
-	<version>1.0</version>
-	<artifactId>ch7466ce-controller</artifactId>
+	<version>0.2.1</version>
+	<artifactId>ch7466ce-api</artifactId>
 	<dependencies>
 
 <dependency>
