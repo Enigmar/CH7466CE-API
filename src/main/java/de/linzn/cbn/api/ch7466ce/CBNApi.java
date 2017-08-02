@@ -35,20 +35,25 @@ public class CBNApi {
         this.client.close();
     }
 
+    private static void signal(String text){
+        System.out.println("CBN " + text);
+    }
+
     // Private functions
 
     public boolean restart_cbn_webinterface(String cbnIP) {
         try {
-            System.out.println("Send restart signal to CBN-Modem...Take some while!");
-            this.client.waitForBackgroundJavaScript(8000);
+            signal("Create first reboot request to cnb-interface.");
+            this.client.waitForBackgroundJavaScript(4000);
             this.client.getPage("http://" + cbnIP + "/common_page/reboot.html");
-            this.client.waitForBackgroundJavaScript(8000);
+            this.client.waitForBackgroundJavaScript(4000);
+            signal("Create second reboot request as backup to cnb-interface.");
             this.client.getPage("http://" + cbnIP + "/common_page/reboot.html");
-            this.client.waitForBackgroundJavaScript(8000);
-            System.out.println("Signal send finish!");
+            this.client.waitForBackgroundJavaScript(6000);
+            signal("Request complete. Exit");
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("No CBN Page found!");
+            signal("No CBN Page found!");
             return false;
         }
         return true;
@@ -56,7 +61,7 @@ public class CBNApi {
 
     private boolean login_cbn_webinterface(String cbnIP, String cbnUsername, String cbnPassword) {
         try {
-            System.out.println("Open login to CBN-Modem...Take some while!");
+            signal("Create login token for cbn-access.");
             HtmlPage loginPage = this.client.getPage("http://" + cbnIP + "/common_page/login.html");
             this.client.waitForBackgroundJavaScript(1000);
             HtmlForm form = loginPage.getHtmlElementById("form-login");
@@ -65,19 +70,19 @@ public class CBNApi {
             HtmlPasswordInput passField = form.getInputByName("loginPassword");
             passField.setValueAttribute(cbnPassword);
             loginPage = form.getInputByValue("Login").click();
-            System.out.println("Logging in to CBN-Modem...Take some while!");
+            signal("Run cbn-login.");
             this.client.waitForBackgroundJavaScript(5000);
-            System.out.println("Login finish!");
+            signal("Ready for api-access.");
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("No CBN Page found!");
+            signal("No CBN Page found!");
             return false;
         }
         return true;
     }
 
     private WebClient init_web_client() {
-        System.out.println("Create connection to CBN-Modem...Take some while!");
+        signal("Setup javascript based web-access.");
         // Create web client
         WebClient wClient = new WebClient(BrowserVersion.CHROME);
         wClient.getOptions().setCssEnabled(false);
