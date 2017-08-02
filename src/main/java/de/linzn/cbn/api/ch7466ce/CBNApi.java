@@ -36,7 +36,7 @@ public class CBNApi {
     }
 
     private static void signal(String text){
-        System.out.println("CBN " + text);
+        System.out.println(text);
     }
 
     // Private functions
@@ -50,7 +50,7 @@ public class CBNApi {
             signal("Create second reboot request as backup to cnb-interface.");
             this.client.getPage("http://" + cbnIP + "/common_page/reboot.html");
             this.client.waitForBackgroundJavaScript(6000);
-            signal("Request complete. Exit");
+            signal("Request complete. Closing thread");
         } catch (IOException e) {
             e.printStackTrace();
             signal("No CBN Page found!");
